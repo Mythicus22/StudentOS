@@ -1,0 +1,174 @@
+.dashboard-container {
+  padding: 40px 0;
+  min-height: calc(100vh - 60px);
+  background-color: var(--light-bg);
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.dashboard-header h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: var(--light-text);
+}
+
+.dashboard-header p {
+  font-size: 16px;
+  color: var(--light-text-secondary);
+}
+
+.dashboard-section {
+  margin-bottom: 50px;
+}
+
+.section-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+  color: var(--light-text);
+  border-bottom: 3px solid var(--primary);
+  padding-bottom: 12px;
+  display: inline-block;
+}
+
+.recent-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.recent-tool-card {
+  background-color: var(--light-surface);
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  color: var(--light-text);
+}
+
+.recent-tool-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+}
+
+.tool-icon {
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: 6px;
+}
+
+.tool-info h3 {
+  margin: 0;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.tool-info p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--light-text-secondary);
+}
+
+.last-used {
+  font-size: 11px;
+  color: var(--light-text-secondary);
+  margin-top: 4px;
+  display: block;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.tool-card {
+  background-color: var(--light-surface);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  border: 2px solid transparent;
+}
+
+.tool-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--primary);
+}
+
+.tool-card-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.tool-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: var(--light-text);
+}
+
+.tool-card p {
+  font-size: 12px;
+  color: var(--light-text-secondary);
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background-color: var(--light-surface);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--light-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+
+  .recent-tools {
+    grid-template-columns: 1fr;
+  }
+
+  .tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
