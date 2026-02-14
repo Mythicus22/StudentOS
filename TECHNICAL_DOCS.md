@@ -1,11 +1,10 @@
-# Student Utility Hub - Technical Documentation
+# StudentOS - Technical Documentation
 
 ## Architecture Overview
 
 **Stack:**
 - Backend: Node.js + Express + TypeScript + MongoDB
 - Frontend: React + Vite
-- Authentication: JWT with HTTP-only cookies
 - Database: MongoDB Atlas (Cloud)
 
 ---

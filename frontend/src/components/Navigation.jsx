@@ -26,7 +26,7 @@ const Navigation = () => {
       <div className="nav-container">
         <Link to="/" className="nav-brand">
           <span className="brand-icon">🎓</span>
-          Student Hub
+          StudentOS
         </Link>
         
         <button className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>

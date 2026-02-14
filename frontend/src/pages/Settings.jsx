@@ -215,7 +215,7 @@ const Settings = () => {
                 <h2>ℹ️ About</h2>
                 <div className="settings-item">
                   <p style={{margin: 0, color: 'var(--light-text-secondary)', fontSize: '14px'}}>
-                    <strong>Student Hub v1.0</strong><br/>
+                    <strong>StudentOS v1.0</strong><br/>
                     Your all-in-one utility dashboard for productivity<br/>
                     <span style={{fontSize: '12px'}}>© 2026 All rights reserved</span>
                   </p>

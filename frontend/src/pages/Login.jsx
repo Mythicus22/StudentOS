@@ -38,7 +38,7 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>🎓 Student Hub</h1>
+          <h1>🎓 StudentOS</h1>
           <p>Your all-in-one utility dashboard</p>
         </div>
 

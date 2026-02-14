@@ -1,6 +1,6 @@
-# Student Utility Hub - Full Stack Application
+# StudentOS - Full Stack Application
 
-A powerful all-in-one student utility web application built with Node.js/Express backend and React frontend. Features user authentication, persistent data storage, and 6 utility tools to boost productivity.
+A powerful all-in-one student utility web application built with Node.js/Express backend and React frontend. Features persistent data storage and multiple utility tools to boost productivity.
 
 ## 🎯 Features
 
