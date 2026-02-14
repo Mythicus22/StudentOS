@@ -207,14 +207,36 @@ To test the application:
 
 ## 📝 Environment Variables
 
-Create `.env` in backend folder:
+### Backend Setup
 
-```
-MONGODB_URL=mongodb://localhost:27017/student-hub
+Create `.env` in the `backend/` folder (copy from `.env.example`):
+
+```env
+# Database
+MONGODB_URL=mongodb+srv://username:password@cluster.mongodb.net/studentos
+
+# JWT
 JWT_SECRET=your_super_secret_jwt_key_change_this
-ENVIRONMENT=DEVELOPMENT
-PORT=3000
+JWT_EXPIRY=7d
+
+# Server
+PORT=5000
+NODE_ENV=development
+
+# Frontend Origin (for CORS)
+FRONTEND_URL=http://localhost:3000
 ```
+
+### Frontend Setup
+
+Create `.env.local` in the `frontend/` folder (copy from `.env.example`):
+
+```env
+VITE_API_BASE_URL=http://localhost:5000
+VITE_ENV=development
+```
+
+**For production**, update `VITE_API_BASE_URL` to your Railway backend URL.
 
 ## 🐛 Known Issues & Limitations
 
@@ -225,21 +247,19 @@ PORT=3000
 
 ## 🚀 Deployment
 
-### Backend (Heroku/Railway)
-```bash
-# Build
-npm run build
+This project is configured for easy deployment:
 
-# Deploy with package.json and dist folder
-```
+- **Backend**: Deploy to [Railway.app](https://railway.app) - Free tier available
+- **Frontend**: Deploy to [Vercel](https://vercel.com) - Free tier available
 
-### Frontend (Vercel/Netlify)
-```bash
-# Build
-npm run build
+### Quick Deployment Steps
 
-# Deploy dist folder
-```
+1. **Configure environment variables** - Copy `.env.example` to `.env` in both folders
+2. **Push to GitHub** - Your code must be on GitHub for deployment
+3. **Deploy backend** to Railway - See [backend/DEPLOYMENT.md](backend/DEPLOYMENT.md)
+4. **Deploy frontend** to Vercel - See [frontend/DEPLOYMENT.md](frontend/DEPLOYMENT.md)
+
+📖 **For complete deployment guide**, see [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 📚 Future Enhancements
 

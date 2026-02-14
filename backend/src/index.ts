@@ -12,7 +12,19 @@ import { connectDB } from './database/index.js';
 
 const app = express();
 
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3000'], credentials: true }));
+// CORS configuration for development and production
+const allowedOrigins = process.env.FRONTEND_URL?.split(',').map(url => url.trim()) || [
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -29,13 +41,14 @@ app.use(errorMiddleware);
 connectDB()
 .then(() => {
     console.log('Database connected successfully.');
-    app.listen(5000, (err: Error | undefined) => {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, (err: Error | undefined) => {
         if (err) {
             console.log('Server startup failed.');
             console.log('Reason: ', err.message);
             process.exit(1);
         }
-        console.log('Server is listening on port:', 5000);
+        console.log('Server is listening on port:', PORT);
     });
 })
 .catch((err: Error) => {
