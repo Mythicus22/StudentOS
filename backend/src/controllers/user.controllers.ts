@@ -6,6 +6,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Types } from "mongoose";
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 export const signupUser = async (req: Request, res: Response) => {
     let username: string = req.body.username;
     let password: string = req.body.password;
@@ -66,9 +68,9 @@ export const loginUser = async (req: Request, res: Response) => {
     console.log(`[LOGIN] User logged in: ${username}`);
     return res.status(200).cookie('token', token, {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: isProduction ? 'none' : 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production'
+        secure: isProduction
     }).json(new ApiResponse(200, 'Login Successful.'));
 };
 
@@ -83,9 +85,9 @@ export const logoutUser = async (req: Request, res: Response) => {
 
     return res.clearCookie('token', {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: isProduction ? 'none' : 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production'
+        secure: isProduction
     }).json(new ApiResponse(200, 'Logged Out Successfully.'));
 };
 
