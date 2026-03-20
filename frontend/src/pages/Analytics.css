@@ -1,118 +1,203 @@
 .analytics-container {
   max-width: 1000px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.stats-section,
-.chart-section,
-.history-section {
-  margin-bottom: 40px;
-}
-
-.stats-grid {
+/* Stats row */
+.analytics-stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 }
 
-.stat-card {
-  background-color: var(--light-surface);
-  border-radius: 8px;
-  padding: 24px;
+.analytics-stat-card {
+  background: var(--light-surface);
+  border-radius: 10px;
+  padding: 20px 16px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.analytics-stat-card:hover {
+  transform: translateY(-3px);
 }
 
-.stat-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
+.analytics-stat-card.highlight {
+  border: 2px solid var(--primary);
+  background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(124,58,237,0.05));
 }
 
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--primary);
+.analytics-stat-icon {
+  font-size: 26px;
   margin-bottom: 8px;
+}
+
+.analytics-stat-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 4px;
+  line-height: 1.2;
   word-break: break-word;
 }
 
-.stat-label {
-  font-size: 14px;
+.analytics-stat-label {
+  font-size: 12px;
   color: var(--light-text-secondary);
-}
-
-.chart-section {
-  background-color: var(--light-surface);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.tool-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.chart-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.chart-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   font-weight: 500;
-  font-size: 14px;
 }
 
-.chart-value {
-  color: var(--primary);
+/* Two column layout */
+.analytics-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Panel */
+.analytics-panel {
+  background: var(--light-surface);
+  border-radius: 10px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.analytics-panel-title {
+  font-size: 15px;
   font-weight: 700;
+  color: var(--light-text);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--light-border);
 }
 
-.chart-bar-container {
-  height: 24px;
-  background-color: var(--light-border);
+/* Tool bars (most used) */
+.tool-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tool-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tool-bar-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.tool-bar-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--light-text-secondary);
+  min-width: 20px;
+}
+
+.tool-bar-icon {
+  font-size: 16px;
+}
+
+.tool-bar-name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--light-text);
+}
+
+.tool-bar-count {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 13px;
+}
+
+.tool-bar-track {
+  height: 8px;
+  background: var(--light-border);
   border-radius: 4px;
   overflow: hidden;
 }
 
-.chart-bar {
+.tool-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   border-radius: 4px;
-  transition: width 0.3s ease;
+  transition: width 0.6s ease;
+  min-width: 4px;
 }
 
-.history-section {
-  background-color: var(--light-surface);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Recently used list */
+.recent-tool-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
+.recent-tool-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--light-border);
+}
+
+.recent-tool-row:last-child {
+  border-bottom: none;
+}
+
+.recent-tool-icon {
+  font-size: 20px;
+  width: 32px;
+  text-align: center;
+}
+
+.recent-tool-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recent-tool-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light-text);
+}
+
+.recent-tool-time {
+  font-size: 11px;
+  color: var(--light-text-secondary);
+}
+
+.recent-tool-uses {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+  white-space: nowrap;
+}
+
+/* Activity timeline */
 .activity-timeline {
   display: flex;
   flex-direction: column;
-  gap: 0;
   position: relative;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .activity-timeline::before {
   content: '';
   position: absolute;
-  left: 11px;
-  top: 24px;
-  bottom: 24px;
+  left: 10px;
+  top: 20px;
+  bottom: 20px;
   width: 2px;
   background: linear-gradient(to bottom, var(--primary), transparent);
 }
@@ -120,63 +205,50 @@
 .activity-item {
   display: flex;
   gap: 16px;
-  padding: 16px 0;
+  padding: 10px 0;
   position: relative;
 }
 
 .activity-dot {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background-color: var(--primary);
+  background: var(--primary);
   border: 3px solid var(--light-surface);
   flex-shrink: 0;
-  margin-top: 4px;
+  margin-top: 2px;
   z-index: 1;
 }
 
 .activity-content {
   flex: 1;
-  padding: 8px 0;
 }
 
 .activity-action {
   margin: 0;
   font-weight: 500;
   color: var(--light-text);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .activity-time {
-  margin: 4px 0 0 0;
-  font-size: 12px;
+  margin: 2px 0 0;
+  font-size: 11px;
   color: var(--light-text-secondary);
 }
 
 @media (max-width: 768px) {
-  .stats-grid {
+  .analytics-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-two-col {
     grid-template-columns: 1fr;
   }
+}
 
-  .stat-card {
-    padding: 16px;
-  }
-
-  .stat-value {
-    font-size: 24px;
-  }
-
-  .chart-section,
-  .history-section {
-    padding: 16px;
-  }
-
-  .activity-timeline::before {
-    left: 9px;
-  }
-
-  .activity-dot {
-    width: 20px;
-    height: 20px;
+@media (max-width: 480px) {
+  .analytics-stats-row {
+    grid-template-columns: 1fr 1fr;
   }
 }

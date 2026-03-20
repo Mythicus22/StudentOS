@@ -14,30 +14,27 @@ const app = express();
 const isProduction = process.env.NODE_ENV === 'production';
 
 // CORS configuration for development and production
-const getAllowedOrigins = () => {
+const getAllowedOrigins = (): string[] => {
   const frontendUrl = process.env.FRONTEND_URL;
-  
-  if (!frontendUrl) {
-    // Only allow localhost in development
-    if (!isProduction) {
-      return ['http://localhost:5173', 'http://localhost:3000'];
-    }
-    // In production, FRONTEND_URL is required
-    console.warn('⚠️  WARNING: FRONTEND_URL not set in production. CORS may fail.');
-    return [];
-  }
-  
-  // Split by comma and trim whitespace (supports multiple origins)
-  return frontendUrl.split(',').map(url => url.trim());
+  if (frontendUrl) return frontendUrl.split(',').map(u => u.trim()).filter(Boolean);
+  if (!isProduction) return ['http://localhost:3000', 'http://localhost:5173'];
+  console.error('[CORS] FRONTEND_URL is not set in production — all cross-origin requests will be blocked.');
+  return [];
 };
 
 const allowedOrigins = getAllowedOrigins();
+console.log(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, Postman, same-origin)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
   optionsSuccessStatus: 200
 }));
 

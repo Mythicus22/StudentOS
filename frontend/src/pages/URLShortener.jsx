@@ -43,12 +43,9 @@ const URLShortener = () => {
 
     try {
       const { data } = await urlAPI.shorten(originalUrl)
-      setUrls([...urls, {
-        shortUrl: data.data.shortUrl,
-        originalUrl: originalUrl,
-        clicks: 0,
-        _id: Math.random().toString()
-      }])
+      // Fetch fresh list so we get the real _id and accurate click counts
+      const fresh = await urlAPI.getAll()
+      setUrls(fresh.data.data.urls || [])
       setOriginalUrl('')
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to shorten URL')

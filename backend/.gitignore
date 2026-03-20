@@ -1,34 +1,23 @@
-# Dependencies
 node_modules/
-package-lock.json
-
-# Build outputs
 dist/
 build/
 *.tsbuildinfo
 
-# Environment variables
+# Secrets — never commit
 .env
 .env.local
 .env.production
 
-# IDE
+# Safe to commit
+# .env.example  ← intentionally NOT ignored
+
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Logs
 logs/
 *.log
 npm-debug.log*
-
-# Misc
-.cache/
-temp/
-tmp/

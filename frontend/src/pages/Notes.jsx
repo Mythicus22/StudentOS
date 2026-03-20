@@ -1,87 +1,86 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { notesAPI, toolsAPI } from '../api'
 import './Tools.css'
+import './Notes.css'
 
 const Notes = () => {
   const [notes, setNotes] = useState([])
-  const [selectedNote, setSelectedNote] = useState(null)
+  const [selectedId, setSelectedId] = useState(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [isNew, setIsNew] = useState(false)
+  const [dirty, setDirty] = useState(false)
+  const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    fetchNotes()
-  }, [])
+  useEffect(() => { fetchNotes() }, [])
 
   const fetchNotes = async () => {
     try {
       const { data } = await notesAPI.getAll()
       setNotes(data.data.notes || [])
-    } catch (err) {
-      setError('Failed to load notes')
-    } finally {
-      setLoading(false)
-    }
+    } catch { setError('Failed to load notes') }
+    finally { setLoading(false) }
   }
 
   const selectNote = async (note) => {
-    setSelectedNote(note._id)
+    setSelectedId(note._id)
     setTitle(note.title)
     setDescription(note.description)
     setIsNew(false)
-    try {
-      await toolsAPI.updateLastNote(note._id)
-    } catch (err) {
-      console.error('Failed to update last note')
-    }
+    setDirty(false)
+    setError('')
+    try { await toolsAPI.updateLastNote(note._id) } catch {}
   }
 
-  const createNewNote = () => {
-    setSelectedNote(null)
+  const createNew = () => {
+    setSelectedId(null)
     setTitle('')
     setDescription('')
     setIsNew(true)
+    setDirty(false)
+    setError('')
   }
 
   const saveNote = async () => {
-    if (!title.trim() || !description.trim()) {
-      setError('Please fill in all fields')
-      return
-    }
-
+    if (!title.trim()) { setError('Title is required'); return }
+    setSaving(true)
     try {
       if (isNew) {
         const { data } = await notesAPI.add(title, description)
-        const newNote = data.data.note
-        setNotes([...notes, newNote])
-        setSelectedNote(newNote._id)
-        await toolsAPI.updateLastNote(newNote._id)
+        const n = data.data.note
+        setNotes(ns => [...ns, n])
+        setSelectedId(n._id)
         setIsNew(false)
+        try { await toolsAPI.updateLastNote(n._id) } catch {}
       } else {
-        await notesAPI.update(selectedNote, title, description)
-        setNotes(notes.map(n => n._id === selectedNote ? {_id: selectedNote, title, description} : n))
+        await notesAPI.update(selectedId, title, description)
+        setNotes(ns => ns.map(n => n._id === selectedId ? { ...n, title, description } : n))
       }
+      setDirty(false)
       setError('')
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save note')
-    }
+      setError(err.response?.data?.message || 'Failed to save')
+    } finally { setSaving(false) }
   }
 
   const deleteNote = async (id) => {
     try {
       await notesAPI.delete(id)
-      setNotes(notes.filter(n => n._id !== id))
-      if (selectedNote === id) {
-        setSelectedNote(null)
-        setTitle('')
-        setDescription('')
-      }
-    } catch (err) {
-      setError('Failed to delete note')
-    }
+      setNotes(ns => ns.filter(n => n._id !== id))
+      if (selectedId === id) { setSelectedId(null); setTitle(''); setDescription(''); setIsNew(false) }
+    } catch { setError('Failed to delete note') }
   }
+
+  const wordCount = description.trim() ? description.trim().split(/\s+/).length : 0
+  const charCount = description.length
+
+  const filteredNotes = notes.filter(n =>
+    n.title.toLowerCase().includes(search.toLowerCase()) ||
+    n.description.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="tool-container">
@@ -91,86 +90,85 @@ const Notes = () => {
           <p>Keep track of your ideas and thoughts</p>
         </div>
 
-        <div className="tool-content" style={{display: 'grid', gridTemplateColumns: '250px 1fr', gap: '20px', maxWidth: '1000px', margin: '0 auto'}}>
+        <div className="notes-layout">
           {/* Sidebar */}
-          <div style={{background: 'var(--light-surface)', borderRadius: '8px', padding: '16px', maxHeight: '600px', overflowY: 'auto'}}>
-            <button onClick={createNewNote} className="primary" style={{width: '100%', marginBottom: '16px'}}>
-              ➕ New Note
+          <div className="notes-sidebar">
+            <button onClick={createNew} className="primary" style={{ width: '100%', marginBottom: '12px' }}>
+              + New Note
             </button>
-
-            <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
-              {notes.length === 0 ? (
-                <p style={{padding: '16px', textAlign: 'center', color: 'var(--light-text-secondary)', fontSize: '14px'}}>
-                  No notes yet
+            <input
+              type="text"
+              placeholder="Search notes..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ width: '100%', marginBottom: '12px', fontSize: '13px' }}
+            />
+            <div className="notes-list">
+              {loading ? (
+                <p style={{ textAlign: 'center', color: 'var(--light-text-secondary)', fontSize: '13px', padding: '20px 0' }}>Loading...</p>
+              ) : filteredNotes.length === 0 ? (
+                <p style={{ textAlign: 'center', color: 'var(--light-text-secondary)', fontSize: '13px', padding: '20px 0' }}>
+                  {notes.length === 0 ? 'No notes yet' : 'No results'}
                 </p>
               ) : (
-                notes.map((note) => (
+                filteredNotes.map(note => (
                   <div
                     key={note._id}
                     onClick={() => selectNote(note)}
-                    style={{
-                      padding: '12px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      background: selectedNote === note._id ? 'var(--primary)' : 'var(--light-border)',
-                      color: selectedNote === note._id ? 'white' : 'var(--light-text)',
-                      transition: 'all 0.2s'
-                    }}
+                    className={`note-item ${selectedId === note._id ? 'active' : ''}`}
                   >
-                    <p style={{margin: 0, fontWeight: 500, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      {note.title}
-                    </p>
-                    <p style={{margin: '4px 0 0 0', fontSize: '12px', opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      {note.description}
-                    </p>
+                    <div className="note-item-title">{note.title}</div>
+                    <div className="note-item-preview">{note.description}</div>
                   </div>
                 ))
               )}
             </div>
+            <div style={{ marginTop: '8px', fontSize: '12px', color: 'var(--light-text-secondary)', textAlign: 'center' }}>
+              {notes.length} note{notes.length !== 1 ? 's' : ''}
+            </div>
           </div>
 
           {/* Editor */}
-          <div style={{background: 'var(--light-surface)', borderRadius: '8px', padding: '20px'}}>
-            {selectedNote || isNew ? (
+          <div className="notes-editor">
+            {selectedId || isNew ? (
               <>
-                <div className="form-group">
-                  <label htmlFor="noteTitle">Title</label>
+                <div className="notes-editor-header">
                   <input
                     type="text"
-                    id="noteTitle"
-                    placeholder="Enter note title"
+                    placeholder="Note title..."
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={e => { setTitle(e.target.value); setDirty(true) }}
+                    className="notes-title-input"
                   />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="noteDesc">Description</label>
-                  <textarea
-                    id="noteDesc"
-                    placeholder="Write your note here..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    style={{minHeight: '300px', resize: 'vertical'}}
-                  />
-                </div>
-
-                {error && <div className="error-message" style={{background: 'rgba(220, 38, 38, 0.1)', padding: '12px', borderRadius: '6px', marginBottom: '12px'}}>{error}</div>}
-
-                <div style={{display: 'flex', gap: '12px', justifyContent: 'flex-end'}}>
-                  {!isNew && (
-                    <button onClick={() => deleteNote(selectedNote)} className="danger">
-                      🗑️ Delete
+                  <div className="notes-editor-actions">
+                    {dirty && <span className="unsaved-badge">Unsaved</span>}
+                    {!isNew && (
+                      <button onClick={() => deleteNote(selectedId)} className="danger" style={{ padding: '7px 12px', fontSize: '13px' }}>🗑️</button>
+                    )}
+                    <button onClick={saveNote} className="primary" disabled={saving} style={{ padding: '7px 16px', fontSize: '13px' }}>
+                      {saving ? '...' : '💾 Save'}
                     </button>
-                  )}
-                  <button onClick={saveNote} className="primary">
-                    💾 Save
-                  </button>
+                  </div>
+                </div>
+
+                <textarea
+                  placeholder="Write your note here..."
+                  value={description}
+                  onChange={e => { setDescription(e.target.value); setDirty(true) }}
+                  className="notes-textarea"
+                  onKeyDown={e => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveNote() } }}
+                />
+
+                <div className="notes-footer">
+                  {error && <span className="error-message" style={{ padding: '4px 0' }}>{error}</span>}
+                  <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--light-text-secondary)' }}>
+                    {wordCount} words · {charCount} chars · Ctrl+S to save
+                  </span>
                 </div>
               </>
             ) : (
-              <div className="placeholder">
-                <p>👈 Select a note to edit or create a new one</p>
+              <div className="placeholder" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <p>👈 Select a note or create a new one</p>
               </div>
             )}
           </div>

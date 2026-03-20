@@ -2,294 +2,211 @@ import React, { useState, useEffect } from 'react'
 import { toolsAPI } from '../api'
 import { useAuth } from '../context/AuthContext'
 import './Tools.css'
+import './Settings.css'
+
+const Toggle = ({ checked, onChange }) => (
+  <button
+    type="button"
+    onClick={onChange}
+    style={{
+      background: checked ? 'var(--primary)' : 'var(--light-border)',
+      width: '48px', height: '26px', borderRadius: '13px',
+      border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.3s', flexShrink: 0
+    }}
+  >
+    <div style={{
+      position: 'absolute', top: '3px',
+      left: checked ? '25px' : '3px',
+      width: '20px', height: '20px',
+      background: 'white', borderRadius: '50%', transition: 'left 0.3s'
+    }} />
+  </button>
+)
 
 const Settings = () => {
-  const { toggleTheme, darkMode } = useAuth()
+  const { toggleTheme, darkMode, username } = useAuth()
   const [preferences, setPreferences] = useState(null)
+  const [cityInput, setCityInput] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [toast, setToast] = useState('')
 
   useEffect(() => {
-    loadPreferences()
+    toolsAPI.getPreferences()
+      .then(({ data }) => {
+        setPreferences(data.data.preferences)
+        setCityInput(data.data.preferences.defaultCity || '')
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
-  const loadPreferences = async () => {
-    try {
-      const { data } = await toolsAPI.getPreferences()
-      setPreferences(data.data.preferences)
-    } catch (err) {
-      setError('Failed to load preferences')
-    } finally {
-      setLoading(false)
-    }
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(''), 2500)
   }
 
   const updatePref = async (newPrefs) => {
     setSaving(true)
-    setError('')
-    setSuccess('')
-
     try {
       await toolsAPI.updatePreferences(newPrefs)
-      setPreferences({...preferences, ...newPrefs})
-      setSuccess('Preferences updated successfully!')
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      setError('Failed to update preferences')
+      setPreferences(p => ({ ...p, ...newPrefs }))
+      showToast('✓ Saved')
+    } catch {
+      showToast('✗ Failed to save')
     } finally {
       setSaving(false)
     }
   }
 
-  const handleThemeToggle = async () => {
+  const handleThemeToggle = () => {
     toggleTheme()
-    await updatePref({darkMode: !darkMode})
+    updatePref({ darkMode: !darkMode })
   }
 
-  const handleCityChange = async (e) => {
-    const city = e.target.value
-    setPreferences({...preferences, defaultCity: city})
-    await updatePref({defaultCity: city})
+  const handleCitySubmit = (e) => {
+    e.preventDefault()
+    if (cityInput.trim()) updatePref({ defaultCity: cityInput.trim() })
   }
 
-  const handleTempUnitChange = async (e) => {
-    const unit = e.target.value
-    setPreferences({...preferences, preferredTemperatureUnit: unit})
-    await updatePref({preferredTemperatureUnit: unit})
-  }
-
-  const handleLengthUnitChange = async (e) => {
-    const unit = e.target.value
-    setPreferences({...preferences, preferredLengthUnit: unit})
-    await updatePref({preferredLengthUnit: unit})
-  }
-
-  const handleWeightUnitChange = async (e) => {
-    const unit = e.target.value
-    setPreferences({...preferences, preferredWeightUnit: unit})
-    await updatePref({preferredWeightUnit: unit})
-  }
-
-  if (loading) {
-    return (
-      <div className="tool-container">
-        <div className="container">
-          <div className="placeholder"><p>Loading settings...</p></div>
-        </div>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="tool-container">
+      <div className="container"><div className="placeholder"><p>Loading settings...</p></div></div>
+    </div>
+  )
 
   return (
     <div className="tool-container">
       <div className="container">
         <div className="tool-header">
           <h1>⚙️ Settings</h1>
-          <p>Customize your experience</p>
+          <p>Customize your StudentOS experience</p>
         </div>
 
-        <div className="tool-content" style={{maxWidth: '600px', margin: '0 auto'}}>
-          {error && <div className="error-message" style={{background: 'rgba(220, 38, 38, 0.1)', padding: '12px', borderRadius: '6px'}}>{error}</div>}
-          {success && <div className="success-message">{success}</div>}
+        {toast && (
+          <div style={{
+            position: 'fixed', top: '80px', right: '24px', zIndex: 999,
+            background: toast.startsWith('✓') ? 'var(--success)' : 'var(--danger)',
+            color: 'white', padding: '10px 20px', borderRadius: '8px',
+            fontWeight: 600, fontSize: '14px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+          }}>{toast}</div>
+        )}
 
-          <div className="settings-group">
-            <h2>🎨 Appearance</h2>
-            
-            <div className="settings-item">
-              <div className="setting-label">
-                <span>Dark Mode</span>
-                <p className="setting-desc">Use dark theme for easier reading at night</p>
+        <div className="settings-layout">
+          {/* Appearance */}
+          <div className="settings-card">
+            <div className="settings-card-title">🎨 Appearance</div>
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Dark Mode</div>
+                <div className="settings-row-desc">Easier on the eyes at night</div>
               </div>
-              <button
-                onClick={handleThemeToggle}
-                className="toggle-btn"
-                style={{
-                  background: darkMode ? 'var(--primary)' : 'var(--light-border)',
-                  width: '50px',
-                  height: '28px',
-                  borderRadius: '14px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  transition: 'all 0.3s'
-                }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  top: '2px',
-                  left: darkMode ? '26px' : '2px',
-                  width: '24px',
-                  height: '24px',
-                  background: 'white',
-                  borderRadius: '50%',
-                  transition: 'left 0.3s'
-                }}></div>
-              </button>
+              <Toggle checked={darkMode} onChange={handleThemeToggle} />
             </div>
           </div>
 
-          {preferences && (
-            <>
-              <div className="settings-group">
-                <h2>🌍 Location</h2>
-                
-                <div className="settings-item">
-                  <div className="setting-label">
-                    <span>Default City</span>
-                    <p className="setting-desc">City used for weather app by default</p>
-                  </div>
-                  <select
-                    value={preferences.defaultCity || 'London'}
-                    onChange={handleCityChange}
-                    disabled={saving}
-                  >
-                    <option value="London">London</option>
-                    <option value="New York">New York</option>
-                    <option value="Tokyo">Tokyo</option>
-                    <option value="Paris">Paris</option>
-                    <option value="Dubai">Dubai</option>
-                    <option value="Sydney">Sydney</option>
-                    <option value="Toronto">Toronto</option>
-                    <option value="Singapore">Singapore</option>
-                  </select>
-                </div>
+          {/* Weather */}
+          <div className="settings-card">
+            <div className="settings-card-title">🌍 Weather Defaults</div>
+            <div className="settings-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '12px' }}>
+              <div>
+                <div className="settings-row-label">Default City</div>
+                <div className="settings-row-desc">Auto-loaded when you open the Weather app</div>
               </div>
+              <form onSubmit={handleCitySubmit} style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                <input
+                  type="text"
+                  value={cityInput}
+                  onChange={e => setCityInput(e.target.value)}
+                  placeholder="e.g. London, Mumbai, New York"
+                  style={{ flex: 1 }}
+                  disabled={saving}
+                />
+                <button type="submit" className="primary" disabled={saving || !cityInput.trim()}>Save</button>
+              </form>
+              {preferences?.defaultCity && (
+                <p style={{ margin: 0, fontSize: '13px', color: 'var(--light-text-secondary)' }}>
+                  Current: <strong>{preferences.defaultCity}</strong>
+                </p>
+              )}
+            </div>
 
-              <div className="settings-group">
-                <h2>🔧 Units Preferences</h2>
-                
-                <div className="settings-item">
-                  <div className="setting-label">
-                    <span>Temperature Unit</span>
-                    <p className="setting-desc">Preferred temperature measurement</p>
-                  </div>
-                  <select
-                    value={preferences.preferredTemperatureUnit || 'C'}
-                    onChange={handleTempUnitChange}
-                    disabled={saving}
-                  >
-                    <option value="C">Celsius (°C)</option>
-                    <option value="F">Fahrenheit (°F)</option>
-                    <option value="K">Kelvin (K)</option>
-                  </select>
-                </div>
+            <div className="settings-divider" />
 
-                <div className="settings-item">
-                  <div className="setting-label">
-                    <span>Length Unit</span>
-                    <p className="setting-desc">Preferred distance measurement</p>
-                  </div>
-                  <select
-                    value={preferences.preferredLengthUnit || 'km'}
-                    onChange={handleLengthUnitChange}
-                    disabled={saving}
-                  >
-                    <option value="m">Meters (m)</option>
-                    <option value="km">Kilometers (km)</option>
-                    <option value="mi">Miles (mi)</option>
-                    <option value="ft">Feet (ft)</option>
-                  </select>
-                </div>
-
-                <div className="settings-item">
-                  <div className="setting-label">
-                    <span>Weight Unit</span>
-                    <p className="setting-desc">Preferred weight measurement</p>
-                  </div>
-                  <select
-                    value={preferences.preferredWeightUnit || 'kg'}
-                    onChange={handleWeightUnitChange}
-                    disabled={saving}
-                  >
-                    <option value="kg">Kilograms (kg)</option>
-                    <option value="g">Grams (g)</option>
-                    <option value="lb">Pounds (lb)</option>
-                    <option value="oz">Ounces (oz)</option>
-                  </select>
-                </div>
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Temperature Unit</div>
+                <div className="settings-row-desc">Used in Weather app display</div>
               </div>
-
-              <div className="settings-group">
-                <h2>ℹ️ About</h2>
-                <div className="settings-item">
-                  <p style={{margin: 0, color: 'var(--light-text-secondary)', fontSize: '14px'}}>
-                    <strong>StudentOS v1.0</strong><br/>
-                    Your all-in-one utility dashboard for productivity<br/>
-                    <span style={{fontSize: '12px'}}>© 2026 All rights reserved</span>
-                  </p>
-                </div>
+              <div className="unit-toggle-group">
+                {['C', 'F', 'K'].map(u => (
+                  <button
+                    key={u}
+                    type="button"
+                    className={preferences?.preferredTemperatureUnit === u ? 'unit-btn active' : 'unit-btn'}
+                    onClick={() => updatePref({ preferredTemperatureUnit: u })}
+                    disabled={saving}
+                  >
+                    {u === 'C' ? '°C' : u === 'F' ? '°F' : 'K'}
+                  </button>
+                ))}
               </div>
-            </>
-          )}
+            </div>
+          </div>
+
+          {/* Units */}
+          <div className="settings-card">
+            <div className="settings-card-title">📐 Unit Preferences</div>
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Length</div>
+                <div className="settings-row-desc">Default unit in converter</div>
+              </div>
+              <select value={preferences?.preferredLengthUnit || 'km'} onChange={e => updatePref({ preferredLengthUnit: e.target.value })} disabled={saving}>
+                <option value="m">Meters (m)</option>
+                <option value="km">Kilometers (km)</option>
+                <option value="mi">Miles (mi)</option>
+                <option value="ft">Feet (ft)</option>
+                <option value="cm">Centimeters (cm)</option>
+                <option value="in">Inches (in)</option>
+              </select>
+            </div>
+            <div className="settings-divider" />
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Weight</div>
+                <div className="settings-row-desc">Default unit in converter</div>
+              </div>
+              <select value={preferences?.preferredWeightUnit || 'kg'} onChange={e => updatePref({ preferredWeightUnit: e.target.value })} disabled={saving}>
+                <option value="kg">Kilograms (kg)</option>
+                <option value="g">Grams (g)</option>
+                <option value="lb">Pounds (lb)</option>
+                <option value="oz">Ounces (oz)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Account */}
+          <div className="settings-card">
+            <div className="settings-card-title">👤 Account</div>
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Username</div>
+                <div className="settings-row-desc">Your StudentOS identity</div>
+              </div>
+              <span style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '15px' }}>@{username}</span>
+            </div>
+            <div className="settings-divider" />
+            <div className="settings-row">
+              <div>
+                <div className="settings-row-label">Version</div>
+                <div className="settings-row-desc">StudentOS</div>
+              </div>
+              <span style={{ fontSize: '13px', color: 'var(--light-text-secondary)', fontWeight: 600 }}>v1.0.0</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style>{`
-        .settings-group {
-          background-color: var(--light-surface);
-          border-radius: 8px;
-          padding: 24px;
-          margin-bottom: 20px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .settings-group h2 {
-          font-size: 18px;
-          margin: 0 0 20px 0;
-          color: var(--light-text);
-          border-bottom: 2px solid var(--light-border);
-          padding-bottom: 12px;
-        }
-
-        .settings-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px 0;
-          border-bottom: 1px solid var(--light-border);
-        }
-
-        .settings-item:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-
-        .setting-label {
-          flex: 1;
-        }
-
-        .setting-label span {
-          display: block;
-          font-weight: 500;
-          color: var(--light-text);
-          margin-bottom: 4px;
-        }
-
-        .setting-desc {
-          margin: 0;
-          font-size: 12px;
-          color: var(--light-text-secondary);
-        }
-
-        .settings-item select {
-          min-width: 150px;
-          padding: 8px 12px;
-        }
-
-        @media (max-width: 600px) {
-          .settings-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-          }
-
-          .settings-item select {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   )
 }

@@ -3,6 +3,20 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Navigation.css'
 
+const navLinks = [
+  { to: '/app', label: 'Dashboard' },
+  { to: '/app/weather', label: 'Weather' },
+  { to: '/app/password', label: 'Passwords' },
+  { to: '/app/todo', label: 'Todo' },
+  { to: '/app/converter', label: 'Converter' },
+  { to: '/app/notes', label: 'Notes' },
+  { to: '/app/url', label: 'URL Shortener' },
+  { to: '/app/pomodoro', label: 'Pomodoro' },
+  { to: '/app/gpa', label: 'GPA Calc' },
+  { to: '/app/analytics', label: 'Analytics' },
+  { to: '/app/settings', label: 'Settings' },
+]
+
 const Navigation = () => {
   const { logout, username, toggleTheme, darkMode, isAuthenticated } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -10,46 +24,48 @@ const Navigation = () => {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    try {
-      await logout()
-      setMobileMenuOpen(false)
-      navigate('/login')
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
+    setMobileMenuOpen(false)
+    await logout()
+    navigate('/')
   }
 
   if (!isAuthenticated) return null
 
+  const isActive = (to) => to === '/app' ? location.pathname === '/app' : location.pathname.startsWith(to)
+
   return (
     <nav className="navigation">
       <div className="nav-container">
-        <Link to="/" className="nav-brand">
+        <Link to="/app" className="nav-brand">
           <span className="brand-icon">🎓</span>
           StudentOS
         </Link>
-        
+
         <button className="mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-          ☰
+          {mobileMenuOpen ? '✕' : '☰'}
         </button>
 
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-          <Link to="/" className="nav-link">Dashboard</Link>
-          <Link to="/weather" className="nav-link">Weather</Link>
-          <Link to="/password" className="nav-link">Password Gen</Link>
-          <Link to="/todo" className="nav-link">Todo</Link>
-          <Link to="/converter" className="nav-link">Converter</Link>
-          <Link to="/notes" className="nav-link">Notes</Link>
-          <Link to="/url" className="nav-link">URL Shortener</Link>
-          <Link to="/analytics" className="nav-link">Analytics</Link>
-          <Link to="/settings" className="nav-link">Settings</Link>
+          {navLinks.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`nav-link ${isActive(to) ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {label}
+            </Link>
+          ))}
         </div>
 
         <div className="nav-right">
           <button className="theme-toggle" onClick={toggleTheme} title={darkMode ? 'Light mode' : 'Dark mode'}>
             {darkMode ? '☀️' : '🌙'}
           </button>
-          <span className="user-name">@{username}</span>
+          <div className="user-chip">
+            <div className="user-avatar">{username?.[0]?.toUpperCase() || 'U'}</div>
+            <span>@{username}</span>
+          </div>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       </div>

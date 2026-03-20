@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
   withCredentials: true
 });
 
@@ -39,6 +39,7 @@ export const authAPI = {
   signup: (username, password) => API.post('/user/signup', { username, password }),
   login: (username, password) => API.post('/user/login', { username, password }),
   logout: () => API.post('/user/logout'),
+  me: () => API.get('/user/me'),
 };
 
 // Todos

@@ -1,0 +1,151 @@
+.notes-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  height: calc(100vh - 260px);
+  min-height: 500px;
+}
+
+.notes-sidebar {
+  background: var(--light-surface);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border: 1px solid var(--light-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.note-item {
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.note-item:hover {
+  background: var(--light-surface-2);
+  border-color: var(--light-border);
+}
+
+.note-item.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.note-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--light-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.note-item.active .note-item-title { color: var(--primary); }
+
+.note-item-preview {
+  font-size: 11px;
+  color: var(--light-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Editor */
+.notes-editor {
+  background: var(--light-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--light-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.notes-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--light-border);
+}
+
+.notes-title-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--light-text);
+  padding: 0;
+}
+
+.notes-title-input:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.notes-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.unsaved-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--warning);
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.notes-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  resize: none;
+  padding: 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--light-text);
+  min-height: 0;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.notes-footer {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-top: 1px solid var(--light-border);
+  min-height: 36px;
+}
+
+@media (max-width: 768px) {
+  .notes-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .notes-sidebar { max-height: 280px; }
+  .notes-editor { min-height: 400px; }
+}

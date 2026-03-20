@@ -1,35 +1,20 @@
-# Dependencies
 node_modules/
-package-lock.json
-yarn.lock
-
-# Build outputs
 dist/
 build/
-.tsbuildinfo
 
-# Environment variables
-.env
+# Secrets — never commit
 .env.local
-.env.production
 
-# IDE
+# .env.production is safe (only has placeholder URL, no secrets)
+# .env.example is safe
+
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
-
-# Logs
 logs/
 *.log
 npm-debug.log*
-
-# Misc
-.cache/
-temp/
-tmp/
